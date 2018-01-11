@@ -30,7 +30,7 @@ write_list(List) :-
         ).
 
 
-% solutions for testing 
+% solutions for testing
 
 solution([f+g,f,f+w,f+g,f+c,f,f+b,f,f+g]).
 solution([f+g,f,f+c,f+g,f+w,f,f+b,f,f+g]).
@@ -47,16 +47,22 @@ solution([f+g,f,f+b,f,f+c,f+g,f+w,f,f+g]).
 
 /* Add code for Step 1 below this comment */
 % safe(+Bank)
-%
-% safe/1 holds when Bank is a given list of items (those left 
+safe([]).
+safe([f|_]).
+safe(L) :- contain(g,L), not(contain(c,L)), not(contain(w, L)).
+safe(L) :- contain(w,L), not(contain(g,L)).
+contain(I, [I|_]).
+contain(I, [X|L]) :- X \= I,contain(I,L).
+
+% safe/1 holds when Bank is a given list of items (those left
 % behind on a bank when a journey is made) that is safe.
 
 
 /* Add code for Step 2 below this comment */
-% safe_state(+State) 
+% safe_state(+State)
 %
-% safe_state/1 holds when State represents a state 
-% in which both of the banks are safe. 
+% safe_state/1 holds when State represents a state
+% in which both of the banks are safe.
 
 /* Add code for Step 3 below this comment */
 % equiv(+State1, +State2)
@@ -73,19 +79,19 @@ solution([f+g,f,f+b,f,f+c,f+g,f+w,f,f+g]).
 /* Add code for Step 5 below this comment */
 % visited(+State, +Sequence)
 %
-% visited/2 holds when a given state State is equivalent to some 
+% visited/2 holds when a given state State is equivalent to some
 % member of a given Sequence
 
 /* Add code for Step 6 below this comment */
 % select(X, List, Remainder)
 %
-% select/3 holds when X is an element of the given (ground) list List and 
-% Remainder is the list obtained when X is removed from List. 
+% select/3 holds when X is an element of the given (ground) list List and
+% Remainder is the list obtained when X is removed from List.
 
-/*  Uncomment the following if you wish to skip Step 6. Else Add code 
+/*  Uncomment the following if you wish to skip Step 6. Else Add code
 for Step 6  below this comment */
 
-/* 
+/*
 
 select(X,List,Remainder) :-
   app_select(X,List,Remainder).
@@ -101,14 +107,14 @@ select(X,List,Remainder) :-
 % succeeds(?Sequence)
 %
 % succeeds/1 holds for a sequence (a list of states) that starts
-% with the initial state (all objects on the north bank) and 
+% with the initial state (all objects on the north bank) and
 % terminates with all objects on the south bank;
 % Where each step is the result of "safe" journeys and no states are
-% repeated. 
+% repeated.
 
 /*  Uncomment the following if you wish to skip Step 8.   Else Add code for Step 8  below this comment */
 
-/* 
+/*
 
 succeeds(Sequence) :- solution(Sequence).
 
@@ -122,4 +128,3 @@ succeeds(Sequence) :- solution(Sequence).
 
 /* Add code for Step 10  below this comment */
 % g_journeys(Seq,N)
-
