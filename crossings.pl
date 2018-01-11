@@ -47,6 +47,7 @@ solution([f+g,f,f+b,f,f+c,f+g,f+w,f,f+g]).
 
 /* Add code for Step 1 below this comment */
 % safe(+Bank)
+
 safe([]).
 safe([f|_]).
 safe(L) :- contain(g,L), not(contain(c,L)), not(contain(w, L)).
@@ -60,38 +61,49 @@ contain(I, [X|L]) :- X \= I,contain(I,L).
 
 /* Add code for Step 2 below this comment */
 % safe_state(+State)
+
 safe_state(North-South) :- safe(North), safe(South).
+
 % safe_state/1 holds when State represents a state
 % in which both of the banks are safe.
 
 /* Add code for Step 3 below this comment */
 % equiv(+State1, +State2)
 % In this problem, I have assumed that the elems are unique.
+
 equiv(N1-S1, N2-S2) :- equalBank(N1, N2), equalBank(S1, S2).
 equalBank(Bank1, Bank2) :- forall(member(M, Bank1), contain(M, Bank2)).
+
 % equiv/2 holds when the two (ground) states are equivalent
 
 
 /* Add code for Step 4 below this comment */
 % goal(+State)
+
 goal([]-[f|_]).
+
 % goal/1 holds when (given, ground) State is a valid goal state
 
 
 /* Add code for Step 5 below this comment */
 % visited(+State, +Sequence)
-%
+
+visited(State, [CurrHis|Rest]) :- equiv(State, CurrHis); visited(State, Rest).
+
 % visited/2 holds when a given state State is equivalent to some
 % member of a given Sequence
 
 /* Add code for Step 6 below this comment */
 % select(X, List, Remainder)
-%
 % select/3 holds when X is an element of the given (ground) list List and
 % Remainder is the list obtained when X is removed from List.
 
 /*  Uncomment the following if you wish to skip Step 6. Else Add code
 for Step 6  below this comment */
+
+
+select(X, [X|Remainder], Remainder).
+select(X, [Y|Rest], [Y|Remainder]) :- select(X, Rest, Remainder).
 
 /*
 
@@ -103,6 +115,16 @@ select(X,List,Remainder) :-
 
 /* Add code for Step 7 below this comment */
 % crossing(+State, -Move, -Next)
+
+% Base case for only farmer move.
+crossing([f|Rest]-South, f, Rest-[f|South]).
+crossing(North-[f|Rest], f, [f|North]-Rest).
+
+% Complicate case for farmer plus another object move.
+crossing([f|Rest]-South, Move, Next)
+    :- select(X, Rest, BankAfter) , Move = f+X, Next = BankAfter-[f,X|South].
+crossing(North-[f|Rest], Move, Next)
+    :- select(X, Rest, BankAfter) , Move = f+X, Next = [f,X|North]-BankAfter.
 
 
 /* Add code for Step 8 below this comment */
