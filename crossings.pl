@@ -60,19 +60,21 @@ contain(I, [X|L]) :- X \= I,contain(I,L).
 
 /* Add code for Step 2 below this comment */
 % safe_state(+State)
-%
+safe_state(North-South) :- safe(North), safe(South).
 % safe_state/1 holds when State represents a state
 % in which both of the banks are safe.
 
 /* Add code for Step 3 below this comment */
 % equiv(+State1, +State2)
-%
+% In this problem, I have assumed that the elems are unique.
+equiv(N1-S1, N2-S2) :- equalBank(N1, N2), equalBank(S1, S2).
+equalBank(Bank1, Bank2) :- forall(member(M, Bank1), contain(M, Bank2)).
 % equiv/2 holds when the two (ground) states are equivalent
 
 
 /* Add code for Step 4 below this comment */
 % goal(+State)
-%
+goal([]-[f|_]).
 % goal/1 holds when (given, ground) State is a valid goal state
 
 
