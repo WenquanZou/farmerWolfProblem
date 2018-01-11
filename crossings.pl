@@ -111,16 +111,15 @@ select(X,List,Remainder) :-
 /* Add code for Step 7 below this comment */
 % crossing(+State, -Move, -Next)
 
-% Base case for only farmer move.
-crossing([f|Rest]-South, f, Rest-[f|South]).
-crossing(North-[f|Rest], f, [f|North]-Rest).
-
 % Complicate case for farmer plus another object move.
 crossing([f|Rest]-South, Move, Next)
     :- select(X, Rest, BankAfter) , Move = f+X, Next = BankAfter-[f,X|South].
 crossing(North-[f|Rest], Move, Next)
     :- select(X, Rest, BankAfter) , Move = f+X, Next = [f,X|North]-BankAfter.
 
+% Base case for only farmer move.
+crossing([f|Rest]-South, f, Rest-[f|South]).
+crossing(North-[f|Rest], f, [f|North]-Rest).
 
 /* Add code for Step 8 below this comment */
 % succeeds(?Sequence)
@@ -140,6 +139,13 @@ succeeds(Sequence) :- solution(Sequence).
 */
 
 succeeds(Sequence) :- journey([f,w,g,c,b]-[], [], Sequence).
+journey([]-_, _, _).
+journey(CurState, History, Sequence)
+  :- safeMove(CurState, Move, NextState), \+ visited(NextState, History)
+  , journey(NextState, [CurState|History], [Move|Sequence]).
+safeMove(CurState, Move, NextState)
+  :- crossing(CurState, Move, NextState),
+   safe_state(NextState).
 
 
 /* Add code for Step 9 below this comment */
