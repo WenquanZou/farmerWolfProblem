@@ -47,51 +47,46 @@ solution([f+g,f,f+b,f,f+c,f+g,f+w,f,f+g]).
 
 /* Add code for Step 1 below this comment */
 % safe(+Bank)
-
-safe([]).
-safe([f|_]).
-safe(L) :- contain(g,L), not(contain(c,L)), not(contain(w, L)).
-safe(L) :- contain(w,L), not(contain(g,L)).
-contain(I, [I|_]).
-contain(I, [X|L]) :- X \= I,contain(I,L).
-
 % safe/1 holds when Bank is a given list of items (those left
 % behind on a bank when a journey is made) that is safe.
 
+safe([]).
+safe([f|_]).
+safe(L) :- contain(g,L), \+ (contain(c,L)), \+ (contain(w, L)).
+safe(L) :- contain(w,L), \+ (contain(g,L)).
+contain(I, [I|_]).
+contain(I, [X|L]) :- X \= I,contain(I,L).
 
 /* Add code for Step 2 below this comment */
 % safe_state(+State)
-
-safe_state(North-South) :- safe(North), safe(South).
-
 % safe_state/1 holds when State represents a state
 % in which both of the banks are safe.
+
+safe_state(North-South) :- safe(North), safe(South).
 
 /* Add code for Step 3 below this comment */
 % equiv(+State1, +State2)
 % In this problem, I have assumed that the elems are unique.
-
-equiv(N1-S1, N2-S2) :- equalBank(N1, N2), equalBank(S1, S2).
-equalBank(Bank1, Bank2) :- forall(member(M, Bank1), contain(M, Bank2)).
-
 % equiv/2 holds when the two (ground) states are equivalent
 
+equiv(N1-S1, N2-S2) :- equalBank(N1, N2), equalBank(S1, S2).
+equalBank(Bank1, Bank2)
+  :- checkLength(Bank1,Bank2), forall(member(M, Bank1), contain(M, Bank2)).
+checkLength(Bank1,Bank2)
+  :- length(Bank1, X), length(Bank2, Y), X =:= Y.
 
 /* Add code for Step 4 below this comment */
 % goal(+State)
+% goal/1 holds when (given, ground) State is a valid goal state
 
 goal([]-[f|_]).
 
-% goal/1 holds when (given, ground) State is a valid goal state
-
-
 /* Add code for Step 5 below this comment */
 % visited(+State, +Sequence)
-
-visited(State, [CurrHis|Rest]) :- equiv(State, CurrHis); visited(State, Rest).
-
 % visited/2 holds when a given state State is equivalent to some
 % member of a given Sequence
+
+visited(State, [CurrHis|Rest]) :- equiv(State, CurrHis); visited(State, Rest).
 
 /* Add code for Step 6 below this comment */
 % select(X, List, Remainder)
@@ -143,6 +138,8 @@ crossing(North-[f|Rest], Move, Next)
 succeeds(Sequence) :- solution(Sequence).
 
 */
+
+succeeds(Sequence) :- journey([f,w,g,c,b]-[], [], Sequence).
 
 
 /* Add code for Step 9 below this comment */
