@@ -139,10 +139,10 @@ succeeds(Sequence) :- solution(Sequence).
 */
 
 succeeds(Sequence) :- journey([f,w,g,c,b]-[], [], Sequence).
-journey([]-[f|_], _, _).
-journey(CurState, History, Sequence)
+journey(State, _, _) :- goal(State), !.
+journey(CurState, History, [Move|Sequence])
   :- safeMove(CurState, Move, NextState, History)
-  , journey(NextState, [CurState|History], [Move|Sequence]).
+  , journey(NextState, [CurState|History], Sequence).
 safeMove(CurState, Move, NextState, History)
   :- crossing(CurState, Move, NextState), safe_state(NextState)
   , \+ visited(NextState, History).
@@ -164,3 +164,5 @@ count_one(F, [H|Recur], [H|Rest]) :- count_one(F, Recur, Rest).
 
 /* Add code for Step 10  below this comment */
 % g_journeys(Seq,N)
+
+g_journeys(Seq,N) :- succeeds(Seq),!, count_items(Seq, [(f+g, N)|_]).
