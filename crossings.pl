@@ -50,10 +50,10 @@ solution([f+g,f,f+b,f,f+c,f+g,f+w,f,f+g]).
 % safe/1 holds when Bank is a given list of items (those left
 % behind on a bank when a journey is made) that is safe.
 
-safe([]).
-safe([f|_]).
-safe(L) :- contain(g,L), \+ (contain(c,L)), \+ (contain(w, L)).
-safe(L) :- contain(w,L), \+ (contain(g,L)).
+safe(L) :- contain(f, L) ,! ;\+ unsafe(L).
+
+unsafe(L) :- contain(g,L), (contain(w, L); contain(c, L)).
+
 contain(I, [I|_]).
 contain(I, [X|L]) :- X \= I,contain(I,L).
 
@@ -111,15 +111,15 @@ select(X,List,Remainder) :-
 /* Add code for Step 7 below this comment */
 % crossing(+State, -Move, -Next)
 
+% Base case for only farmer move.
+crossing([f|Rest]-South, f, Rest-[f|South]).
+crossing(North-[f|Rest], f, [f|North]-Rest).
+
 % Complicate case for farmer plus another object move.
 crossing([f|Rest]-South, Move, Next)
     :- select(X, Rest, BankAfter) , Move = f+X, Next = BankAfter-[f,X|South].
 crossing(North-[f|Rest], Move, Next)
     :- select(X, Rest, BankAfter) , Move = f+X, Next = [f,X|North]-BankAfter.
-
-% Base case for only farmer move.
-crossing([f|Rest]-South, f, Rest-[f|South]).
-crossing(North-[f|Rest], f, [f|North]-Rest).
 
 /* Add code for Step 8 below this comment */
 % succeeds(?Sequence)
@@ -139,19 +139,28 @@ succeeds(Sequence) :- solution(Sequence).
 */
 
 succeeds(Sequence) :- journey([f,w,g,c,b]-[], [], Sequence).
-journey([]-_, _, _).
+journey([]-[f|_], _, _).
 journey(CurState, History, Sequence)
-  :- safeMove(CurState, Move, NextState), \+ visited(NextState, History)
+  :- safeMove(CurState, Move, NextState, History)
   , journey(NextState, [CurState|History], [Move|Sequence]).
-safeMove(CurState, Move, NextState)
-  :- crossing(CurState, Move, NextState),
-   safe_state(NextState).
+safeMove(CurState, Move, NextState, History)
+  :- crossing(CurState, Move, NextState), safe_state(NextState)
+  , \+ visited(NextState, History).
 
 
 /* Add code for Step 9 below this comment */
 % count_items(List, Stats)
+% count_items(+List, ?ImmList, -Final)
+count_items(List, Stats) :- count_items(List, [], Stats).
 
+count_items([], Final, Final).
+count_items([F|Rest], Imm, Final)
+  :- count_one((F, Occ), Imm, Recur), !, TotalOcc is Occ+1,
+  count_items(Rest, [(F, TotalOcc)|Recur], Final).
+count_items([F|Rest], Imm, Final) :- count_items(Rest, [(F,1)|Imm], Final).
 
+count_one((F,Occ), [(F,Occ)|Recur], Recur) :- !.
+count_one(F, [H|Recur], [H|Rest]) :- count_one(F, Recur, Rest).
 
 /* Add code for Step 10  below this comment */
 % g_journeys(Seq,N)
