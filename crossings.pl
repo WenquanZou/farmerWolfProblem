@@ -159,11 +159,11 @@ count_items(List, Stats) :- count_items(List, [], Stats).
 
 count_items([], Final, Final).
 count_items([F|Rest], Imm, Final)
-  :- count_one((F, Occ), Imm, Recur), !, TotalOcc is Occ+1,
-  count_items(Rest, [(F, TotalOcc)|Recur], Final).
-count_items([F|Rest], Imm, Final) :- count_items(Rest, [(F,1)|Imm], Final).
+  :- count_one((F, _), Imm, Recur), !,
+  count_items(Rest, Recur, Final).
+count_items([F|Rest], Imm, Final) :- append(Imm, [(F,1)], ImmNext), count_items(Rest, ImmNext, Final).
 
-count_one((F,Occ), [(F,Occ)|Recur], Recur) :- !.
+count_one((F,Occ), [(F,Occ)|Recur], [(F,OccPlus)|Recur]) :- OccPlus is Occ + 1.
 count_one(F, [H|Recur], [H|Rest]) :- count_one(F, Recur, Rest).
 
 /* Add code for Step 10  below this comment */
