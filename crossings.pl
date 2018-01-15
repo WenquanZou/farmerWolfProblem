@@ -50,7 +50,7 @@ solution([f+g,f,f+b,f,f+c,f+g,f+w,f,f+g]).
 % safe/1 holds when Bank is a given list of items (those left
 % behind on a bank when a journey is made) that is safe.
 
-safe(L) :- contain(f, L) ,! ;\+ unsafe(L).
+safe(L) :- \+ (\+ contain(f, L), unsafe(L)).
 
 unsafe(L) :- contain(g,L), (contain(w, L); contain(c, L)).
 
@@ -116,11 +116,15 @@ crossing([f|Rest]-South, f, Rest-[f|South]).
 crossing(North-[f|Rest], f, [f|North]-Rest).
 
 % Complicate case for farmer plus another object move.
-crossing([f|Rest]-South, Move, Next)
-    :- select(X, Rest, BankAfter) , Move = f+X, Next = BankAfter-[f,X|South].
-crossing(North-[f|Rest], Move, Next)
-    :- select(X, Rest, BankAfter) , Move = f+X, Next = [f,X|North]-BankAfter.
+% crossing([f|Rest]-South, Move, Next)
+%     :- select(X, Rest, BankAfter) , Move = f+X, Next = BankAfter-[f,X|South].
+% crossing(North-[f|Rest], Move, Next)
+%     :- select(X, Rest, BankAfter) , Move = f+X, Next = [f,X|North]-BankAfter.
 
+crossing([f|Rest]-South, f+X, BankAfter-[f,X|South])
+    :- select(X, Rest, BankAfter).
+crossing(North-[f|Rest], f+X, [f,X|North]-BankAfter)
+    :- select(X, Rest, BankAfter).
 /* Add code for Step 8 below this comment */
 % succeeds(?Sequence)
 %
@@ -139,7 +143,7 @@ succeeds(Sequence) :- solution(Sequence).
 */
 
 succeeds(Sequence) :- journey([f,w,g,c,b]-[], [], Sequence).
-journey(State, _, []) :- goal(State), !.
+journey(State, _, []) :- goal(State).
 journey(CurState, History, [Move|Sequence])
   :- safeMove(CurState, Move, NextState, History)
   , journey(NextState, [CurState|History], Sequence).
@@ -165,4 +169,4 @@ count_one(F, [H|Recur], [H|Rest]) :- count_one(F, Recur, Rest).
 /* Add code for Step 10  below this comment */
 % g_journeys(Seq,N)
 
-g_journeys(Seq,N) :- succeeds(Seq), count_items(Seq, [(f+g, N)|_]).
+g_journeys(Seq,N) :- succeeds(Seq), count_items(Seq, Seqs), member((f+g, N), Seqs).
